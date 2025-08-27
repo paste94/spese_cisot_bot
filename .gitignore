@@ -1,3 +1,4 @@
 .env
 g-sheet-credentials.json
 __pycache__
+venv/
