@@ -12,3 +12,5 @@ month_name = {
     11: "Nov",
     12: "Dic"
 }
+
+division_string = ['diviso', 'divisa', 'div', 'splittata', 'splittato', 'split']
