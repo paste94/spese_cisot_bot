@@ -31,7 +31,10 @@ def parse_message(message):
         split = True
     else:
         split = False
-    description = tokens[1].replace('diviso', '').replace(',','').strip()
+    description = tokens[1]
+    for div_string in division_string:
+        description = description.replace(div_string, '')
+    description = description.replace(',','').strip()
     row = {
         'price': price,
         'description': description,
