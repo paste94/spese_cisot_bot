@@ -13,6 +13,7 @@ from functools import wraps
 from users.users import Users
 import traceback
 from my_exceptions import MessageFormatNotSupported
+from collections import defaultdict
 
 load_dotenv()
 
@@ -24,6 +25,8 @@ CREDENTIALS_FILE = "g-sheet-credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 CREDS = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
 CLIENT = gspread.authorize(CREDS)
+
+user_states = defaultdict(lambda: None)  # None, "waiting_link", "waiting_confirm"
 
 def parse_message(message):
     tokens = message.strip().split(' ', 1)
@@ -151,10 +154,11 @@ def handle_button_click(call):
     print(f'BUTTON CLICK {call}')
     bot.answer_callback_query(call.id)
     chat_id = call.message.chat.id
-    # message_id = call.message.chat.id
-    bot.send_message(call.message.chat.id, call.data)
+    bot.send_message(chat_id, call.data)
     if call.data == 'new': 
-        bot.send_message(call.message.chat.id, call.data)
+        user_states[chat_id] = "waiting_link"
+        bot.send_message(chat_id, 'Inserisci il link del nuovo Google Sheet da usare:')
+
 
 
 
@@ -162,14 +166,38 @@ def handle_button_click(call):
 @handle_errors(bot)
 def get_message(message):
     print(f'Message: {message.text}')
-    # try:
-    if USERS.is_authorized(message.from_user.username):
-        row = parse_message(message.text)
-        add_row(row, message.from_user.username)
+    chat_id = message.chat.id
+    if user_states[chat_id] == "waiting_link":
+        link = message.text.strip()
+        user_states[chat_id + "_link"] = link
+
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton("✅ Sì (Default)", callback_data="si"),
+            InlineKeyboardButton("❌ No", callback_data="no")
+        )
+
+        try:
+            sheet_name = get_sheet_name(link)  # Verifica che il link sia valido
+
+            bot.send_message(
+                chat_id,
+                f"📊 Sheet {sheet_name} trovato: Vuoi che questo sheet diventi il default?",
+            )
+
+            user_states[chat_id] = "waiting_confirm"
+        except Exception as e:
+            bot.send_message(chat_id, f"❌ Errore: Impossibile aprire lo sheet. Controlla il link e riprova.\nDettagli: {str(e)}")
+            user_states[chat_id] = None  # Resetta lo stato
+
     else:
-        bot.reply_to(message, "Non sei autorizzato a inviare spese.")
-        return
-    bot.send_message(message.chat.id, f"Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
+        if USERS.is_authorized(message.from_user.username):
+            row = parse_message(message.text)
+            add_row(row, message.from_user.username)
+        else:
+            bot.reply_to(message, "Non sei autorizzato a inviare spese.")
+            return
+        bot.send_message(message.chat.id, f"Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
 
 @bot.message_handler(commands=['about'])
 def about_cmd(message):
