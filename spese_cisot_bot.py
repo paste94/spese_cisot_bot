@@ -118,6 +118,10 @@ def set_new_link_button(chat_id: str, username: str, update_current: bool):
     user_states[f"{chat_id}_link"] = None
     user_states[chat_id] = None
 
+def switch_index_button(chat_id: str, username: str, index: int):
+    USERS.switch_url_by_index(username, index)
+    bot.send_message(chat_id, f'✅ Sheet cambiato correttamente.')
+
 ### MESSAGE HANDLERS ###
 def new_link_handler(message: str):
     link = message.text.strip()
@@ -203,12 +207,17 @@ def handle_button_click(call):
     
     bot.answer_callback_query(call.id)
     chat_id = call.message.chat.id
+    old_url = USERS.get_old(call.from_user.username)
     if call.data == 'new': 
         add_sheet_button(chat_id)
     if call.data == 'si':
         set_new_link_button(chat_id, call.from_user.username, True)
     if call.data == 'no':
         set_new_link_button(chat_id, call.from_user.username, False)
+    if call.data == 'current':
+        bot.send_message(chat_id, f"📊 Sheet corrente: {get_sheet_name(USERS.get_url(call.from_user.username))}")
+    if call.data.isdigit():
+        switch_index_button(chat_id, call.from_user.username, int(call.data))
 
 @bot.message_handler(func=lambda msg: True)
 @handle_errors(bot)

@@ -83,6 +83,23 @@ class Users:
                 return f'{username} url added correctly'
 
         raise ValueError(f'User {username} not found')
+    
+    def switch_url_by_index(self, username: str, index: int) -> str:
+        self._reload_if_changed()
+
+        for user in self._data['USER_LIST']:
+            if user['USERNAME'] == username:
+                if index < 0 or index >= len(user['GSHEET_OLD']):
+                    raise IndexError('Index out of range')
+                old_url = user['GSHEET_URL']
+                new_url = user['GSHEET_OLD'][index]
+                user['GSHEET_OLD'][index] = old_url
+                user['GSHEET_URL'] = new_url
+                with open(self.filename, "w") as f:
+                    json.dump(self._data, f, indent=4)
+                return f'{username} url switched correctly'
+
+        raise ValueError(f'User {username} not found')
 
         
 
