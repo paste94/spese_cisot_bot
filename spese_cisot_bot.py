@@ -183,18 +183,18 @@ def get_message(message):
             InlineKeyboardButton("❌ No", callback_data="no")
         )
 
-        try:
-            sheet_name = get_sheet_name(link)  # Verifica che il link sia valido
+        # try:
+        sheet_name = get_sheet_name(link)  # Verifica che il link sia valido
 
-            bot.send_message(
-                chat_id,
-                f"📊 Sheet {sheet_name} trovato: Vuoi che questo sheet diventi il default?",
-            )
+        bot.send_message(
+            chat_id,
+            f"📊 Sheet {sheet_name} trovato: Vuoi che questo sheet diventi il default?",
+        )
 
-            user_states[chat_id] = "waiting_confirm"
-        except Exception as e:
-            bot.send_message(chat_id, f"❌ Errore: Impossibile aprire lo sheet. Controlla il link e riprova.\nDettagli: {str(e)}")
-            user_states[chat_id] = None  # Resetta lo stato
+        user_states[chat_id] = "waiting_confirm"
+        # except Exception as e:
+        #     bot.send_message(chat_id, f"❌ Errore: Impossibile aprire lo sheet. Controlla il link e riprova.\nDettagli: {str(e)}")
+        #     user_states[chat_id] = None  # Resetta lo stato
 
     else:
         if USERS.is_authorized(message.from_user.username):
