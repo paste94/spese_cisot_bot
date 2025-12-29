@@ -219,7 +219,7 @@ def get_message(message):
 
     chat_id = message.chat.id
     if user_states[chat_id] == "waiting_link":
-        new_link_handler(chat_id, message)
+        new_link_handler(message)
     else:
         add_row_handler(message)
 
