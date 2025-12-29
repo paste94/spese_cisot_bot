@@ -94,8 +94,12 @@ def add_row(row, username: str):
     sheet.update_cell(index, 6, row['split'])
 
 def get_sheet_name(url: str) -> str:
-    spreadsheet = CLIENT.open_by_url(url)
-    return spreadsheet.title
+    try:
+        spreadsheet = CLIENT.open_by_url(url)
+        return spreadsheet.title
+    except Exception as e:
+        print(f"Error getting sheet name: {e}, type: {type(e)}")
+        return "Unknown Sheet"
 
 
 #%%
