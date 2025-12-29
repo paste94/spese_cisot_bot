@@ -143,16 +143,16 @@ def new_link_handler(message: str):
 def add_row_handler(message):
     row = parse_message(message.text)
     add_row(row, message.from_user.username)
-    bot.send_message(message.chat.id, f"Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
+    bot.send_message(message.chat.id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
 
 
 #%%
 
 bot = telebot.TeleBot(TOKEN)
 bot.set_my_commands([
-    telebot.types.BotCommand("help", "Guida rapida"),
-    telebot.types.BotCommand("about", "Info sul bot"),
-    telebot.types.BotCommand("settings", "Impostazioni"),
+    telebot.types.BotCommand("help", "🆘 Guida rapida"),
+    telebot.types.BotCommand("about", "👀 Info sul bot"),
+    telebot.types.BotCommand("settings", "⚙️ Impostazioni"),
 ])
 
 # /help
@@ -160,36 +160,36 @@ bot.set_my_commands([
 def help_cmd(message):
     bot.send_message(
         message.chat.id,
-        """Per aggiungere una spesa, invia un messaggio nel formato:
+        """ℹ️ Per aggiungere una spesa, invia un messaggio nel formato:
 
-<prezzo> <descrizione> [diviso|divisa|div|splittata|splittato|split]""",
+<prezzo> <descrizione> [diviso]""",
         parse_mode="Markdown"
     )
 
 # /about
 @bot.message_handler(commands=['about'])
 def about_cmd(message):
-    bot.send_message(message.chat.id, "Bot Cisottiano per la gestione delle spese in famiglia. Se non sei un Cisot non dovresti stare qui.")
+    bot.send_message(message.chat.id, "🤖 Bot Cisottiano per la gestione delle spese in famiglia. Se non sei un Cisot non dovresti stare qui.")
 
 # /settings
 @bot.message_handler(commands=['settings'])
 def about_cmd(message):
     if not USERS.is_authorized(message.from_user.username):
-        bot.reply_to(message, "Non sei autorizzato a inviare messaggi.")
+        bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
         return
 
     current_url = USERS.get_url(message.from_user.username)
     old_url = USERS.get_old(message.from_user.username)
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
-        InlineKeyboardButton(f"{get_sheet_name(current_url)} (CURRENT)", callback_data='current'),
+        InlineKeyboardButton(f"📊 {get_sheet_name(current_url)} (CURRENT)", callback_data='current'),
     )
     for index, url in enumerate(old_url):
         markup.add(
-            InlineKeyboardButton(f"{get_sheet_name(url)}", callback_data=index),
+            InlineKeyboardButton(f"📊 {get_sheet_name(url)}", callback_data=index),
         )
     markup.add(
-        InlineKeyboardButton(f"Aggiungi nuovo sheet", callback_data='new'),
+        InlineKeyboardButton(f"➕ Aggiungi nuovo sheet", callback_data='new'),
     )
 
     bot.send_message(message.chat.id, "Seleziona uno sheet", reply_markup=markup)
@@ -198,7 +198,7 @@ def about_cmd(message):
 @handle_errors(bot)
 def handle_button_click(call):
     if not USERS.is_authorized(call.from_user.username):
-        bot.reply_to(call.message, "Non sei autorizzato a inviare messaggi.")
+        bot.reply_to(call.message, "❌ Non sei autorizzato a inviare messaggi.")
         return
     
     bot.answer_callback_query(call.id)
@@ -214,7 +214,7 @@ def handle_button_click(call):
 @handle_errors(bot)
 def get_message(message):
     if not USERS.is_authorized(message.from_user.username):
-        bot.reply_to(message, "Non sei autorizzato a inviare messaggi.")
+        bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
         return
 
     chat_id = message.chat.id
@@ -222,7 +222,7 @@ def get_message(message):
         new_link_handler(chat_id, message)
     else:
         add_row_handler(message)
-        
+
 @bot.message_handler(commands=['about'])
 def about_cmd(message):
     bot.send_message(message.chat.id, "🤖 Bot di esempio con suggerimenti di interazione.")
