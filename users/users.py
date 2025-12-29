@@ -24,13 +24,25 @@ class Users:
 
     def get_url(self, username: str) -> str:
         """
-        Recupera un utente
+        Recupera l'url corrente
         """
         self._reload_if_changed()
         
         for user in self._data['USER_LIST']:
             if user['USERNAME'] == username:
                 return user['GSHEET_URL']
+        
+        raise ValueError(f'User {username} not found')
+
+    def get_old(self, username: str) -> list:
+        """
+        Recupera tutti gli url old
+        """
+        self._reload_if_changed()
+        
+        for user in self._data['USER_LIST']:
+            if user['USERNAME'] == username:
+                return user['GSHEET_OLD']
         
         raise ValueError(f'User {username} not found')
 
