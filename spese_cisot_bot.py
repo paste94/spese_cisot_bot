@@ -12,8 +12,9 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from functools import wraps
 from users.users import Users
 import traceback
-from my_exceptions import MessageFormatNotSupported
+from my_exceptions import MessageFormatNotSupported, UnknownLLinkError
 from collections import defaultdict
+from gspread import NoValidUrlKeyFound
 
 load_dotenv()
 
@@ -98,9 +99,11 @@ def get_sheet_name(url: str) -> str:
         spreadsheet = CLIENT.open_by_url(url)
         return spreadsheet.title
     except Exception as e:
-        print(f"Error getting sheet name: {e}, type: {type(e)}")
-        return "Unknown Sheet"
-
+        if isinstance(e, NoValidUrlKeyFound):
+            raise UnknownLLinkError("Link Google Sheet non valido")
+        if isinstance(e, PermissionError):
+            raise PermissionError("Accesso negato allo Sheet. Per ottenerlo, accedere allo sheet e condividerlo con l'user del bot.")
+        raise e
 
 #%%
 
