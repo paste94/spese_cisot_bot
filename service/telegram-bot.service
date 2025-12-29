@@ -1,0 +1,14 @@
+[Unit]
+Description=Telegram Bot
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi/Applications/spese_cisot_bot
+ExecStart=/home/pi/Applications/spese_cisot_bot/run.sh
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/pi/Applications/spese_cisot_bot/bot.log
+StandardError=append:/home/pi/Applications/spese_cisot_bot/bot.log
+
+[Install]
+WantedBy=default.target
