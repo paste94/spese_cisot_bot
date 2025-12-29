@@ -186,7 +186,7 @@ def about_cmd(message):
     )
     for index, url in enumerate(old_url):
         markup.add(
-            InlineKeyboardButton(f"📊 {get_sheet_name(url)}", callback_data=index),
+            InlineKeyboardButton(f"📊 {get_sheet_name(url)}", callback_data=str(index)),
         )
     markup.add(
         InlineKeyboardButton(f"➕ Aggiungi nuovo sheet", callback_data='new'),
