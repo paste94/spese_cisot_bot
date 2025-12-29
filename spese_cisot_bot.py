@@ -169,7 +169,7 @@ def get_message(message):
     print(f'Current state: {user_states[chat_id]}')
     if user_states[chat_id] == "waiting_link":
         link = message.text.strip()
-        user_states[chat_id + "_link"] = link
+        user_states[f"{chat_id}_link"] = link
 
         markup = InlineKeyboardMarkup(row_width=2)
         markup.add(
