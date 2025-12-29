@@ -161,7 +161,7 @@ def handle_button_click(call):
     print(f'BUTTON CLICK {call}')
     bot.answer_callback_query(call.id)
     chat_id = call.message.chat.id
-    bot.send_message(chat_id, call.data)
+    # bot.send_message(chat_id, call.data)
     if call.data == 'new': 
         user_states[chat_id] = "waiting_link"
         print(f'State updated: {user_states[chat_id]}')
@@ -169,9 +169,13 @@ def handle_button_click(call):
     if call.data == 'si':
         link = user_states[f"{chat_id}_link"]
         USERS.add_url_to_list(call.from_user.username, link, update_current=True)
+        bot.send_message(chat_id, 'Impostato nuovo sheet come default correttamente.')
     if call.data == 'no':
         link = user_states[f"{chat_id}_link"]
         USERS.add_url_to_list(call.from_user.username, link, update_current=False)
+        bot.send_message(chat_id, 'Aggiunto nuovo sheet correttamente.')
+
+
 
 
 @bot.message_handler(func=lambda msg: True)
