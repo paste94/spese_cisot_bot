@@ -196,6 +196,7 @@ def get_message(message):
         bot.send_message(
             chat_id,
             f"📊 Sheet {sheet_name} trovato: Vuoi che questo sheet diventi il default?",
+            reply_markup=markup
         )
 
         user_states[chat_id] = "waiting_confirm"
