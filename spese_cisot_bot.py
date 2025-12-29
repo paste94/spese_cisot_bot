@@ -159,6 +159,12 @@ def handle_button_click(call):
         user_states[chat_id] = "waiting_link"
         print(f'State updated: {user_states[chat_id]}')
         bot.send_message(chat_id, 'Inserisci il link del nuovo Google Sheet da usare:')
+    if call.data == 'si':
+        link = user_states[f"{chat_id}_link"]
+        USERS.add_url_to_list(call.from_user.username, link, update_current=True)
+    if call.data == 'no':
+        link = user_states[f"{chat_id}_link"]
+        USERS.add_url_to_list(call.from_user.username, link, update_current=False)
 
 
 @bot.message_handler(func=lambda msg: True)

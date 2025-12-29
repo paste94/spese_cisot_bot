@@ -55,7 +55,7 @@ class Users:
         
         return False
 
-    def update_url(self, username: str, new_url: str) -> str:
+    def update_current_url(self, username: str, new_url: str) -> str:
         self._reload_if_changed()
 
         for user in self._data['USER_LIST']:
@@ -65,6 +65,23 @@ class Users:
                     json.dump(self._data, f, indent=4)
                 return f'{username} url updated correctly'
         
+        raise ValueError(f'User {username} not found')
+    
+    def add_url_to_list(self, username: str, new_url: str, update_current: bool) -> str:
+        self._reload_if_changed()
+
+        for user in self._data['USER_LIST']:
+            if user['USERNAME'] == username:
+                if update_current:
+                    old_url = user['GSHEET_URL']
+                    user['GSHEET_OLD'].append(old_url)
+                    user['GSHEET_URL'] = new_url
+                else:
+                    user['GSHEET_OLD'].append(new_url)
+                with open(self.filename, "w") as f:
+                    json.dump(self._data, f, indent=4)
+                return f'{username} url added correctly'
+
         raise ValueError(f'User {username} not found')
 
         
