@@ -101,5 +101,4 @@ class Users:
 
         raise ValueError(f'User {username} not found')
 
-USERS = _Users()
 
