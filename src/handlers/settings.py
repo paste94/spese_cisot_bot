@@ -1,9 +1,9 @@
 from bot_instance import bot
+from services.gsheet.utils import get_sheet_name
 from services.settings.settings_state import SettingsState
 from services.users.users import USERS
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.utilities import handle_errors
-from spese_cisot_bot import get_sheet_name
 
 # /settings
 @bot.message_handler(commands=['settings'])

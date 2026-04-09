@@ -1,8 +1,8 @@
 from gspread import NoValidUrlKeyFound
 from config import MONTH_NAMES
+from services.gsheet.client import CLIENT
 from services.gsheet.exceptions import UnknownLinkError
 from services.users.users import USERS
-from spese_cisot_bot import CLIENT
 from datetime import datetime
 
 def get_sheet_name(url: str) -> str:
