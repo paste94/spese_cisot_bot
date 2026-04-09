@@ -1,7 +1,7 @@
 from bot_instance import bot
+from services.gsheet.utils import add_row
 from services.utilities import handle_errors, parse_message
 from services.users.users import USERS
-from spese_cisot_bot import add_row
 
 @bot.message_handler(func=lambda msg: True)
 @handle_errors(bot)
