@@ -22,6 +22,7 @@ load_dotenv()
 USERS=Users()
 # GET IT FROM BOTFATHER 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+print('TOKEN: ' + TOKEN)
 # GET IT FROM GOOGLE SHEET API
 CREDENTIALS_FILE = "g-sheet-credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
