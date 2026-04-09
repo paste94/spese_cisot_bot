@@ -3,6 +3,7 @@ from telebot import TeleBot, types
 from telebot.asyncio_storage import StateMemoryStorage
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+print(TOKEN)
 
 state_storage = StateMemoryStorage()
 bot = TeleBot(TOKEN, state_storage=state_storage)
