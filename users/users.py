@@ -1,7 +1,7 @@
 import json
 import os
 
-class _Users:
+class Users:
     def __init__(self) -> None:
         self.filename = 'users/users.json'
         self._last_mtime: float = 0.0
