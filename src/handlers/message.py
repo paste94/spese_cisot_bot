@@ -52,7 +52,7 @@ def handle_split_response(call):
     bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
-        text=f"🤔 Vuoi che questa spesa sia divisa? → {'✅ Sì' if call.data == 'si' else '❌ No'}",
+        text=f"🤔 Vuoi che questa spesa sia divisa? → {'✅ Sì' if call.data == 'si_split' else '❌ No'}",
         reply_markup=None  # rimuove i bottoni
     )
     bot.answer_callback_query(call.id)
