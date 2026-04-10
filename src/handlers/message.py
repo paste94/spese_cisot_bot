@@ -28,14 +28,14 @@ def get_message(message):
             InlineKeyboardButton("❌ No (Default)", callback_data="no_split")
         )
         
-        bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
+        sent = bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
         bot.set_state(user_id , MessageState.waiting_split_decision, chat_id)
 
         with bot.retrieve_data(user_id, chat_id) as data:
             # data["timer"] = timer
             data["row"] = row
 
-        start_timeout(chat_id, user_id, username, TIMEOUT_SECONDS)
+        start_timeout(chat_id, user_id, username, TIMEOUT_SECONDS, sent.message_id)
     else:
         handle_add_row(row, username, chat_id, user_id)
 
@@ -49,8 +49,17 @@ def handle_split_response(call):
     if call.data == "si_split":
         row["split"] = True
     
+    bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text=f"🤔 Vuoi che questa spesa sia divisa? → {'✅ Sì' if call.data == 'si' else '❌ No'}",
+        reply_markup=None  # rimuove i bottoni
+    )
+    bot.answer_callback_query(call.id)
+
+    bot.send_message(call.message.chat.id, f"Ok, attendi che la spesa venga caricata...")
     handle_add_row(row, call.from_user.username, call.message.chat.id, user_id)
-    bot.delete_state(user_id, call.message.chat.id)
+    # bot.delete_state(user_id, call.message.chat.id)
 
 # @bot.message_handler(state=MessageState.waiting_split_decision)
 # @handle_errors(bot)
@@ -71,9 +80,15 @@ def handle_split_response(call):
 #         row['split'] = True 
 #     handle_add_row(row, username, chat_id, user_id)
 
-def on_timeout(chat_id: str, user_id: str, username: str):
+def on_timeout(chat_id: str, user_id: str, username: str, message_id: str):
     with bot.retrieve_data(user_id, chat_id) as data:
         row = data["row"]
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=message_id,
+        text="🤔 Vuoi che questa spesa sia divisa? → ❌ No (Default - timeout)",
+        reply_markup=None
+    )
     handle_add_row(row, username, chat_id, user_id)
 
 def handle_add_row(row, username, chat_id, user_id):
@@ -82,11 +97,11 @@ def handle_add_row(row, username, chat_id, user_id):
     bot.delete_state(user_id, chat_id)
     bot.send_message(chat_id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
 
-def start_timeout(chat_id, user_id, username, seconds):
+def start_timeout(chat_id, user_id, username, seconds, message_id):
     # Cancella eventuale timer precedente
     cancel_timeout(user_id)
 
-    timer = threading.Timer(seconds, on_timeout, args=[chat_id, user_id, username])
+    timer = threading.Timer(seconds, on_timeout, args=[chat_id, user_id, username, message_id])
     timer.start()
     active_timers[user_id] = timer
 
