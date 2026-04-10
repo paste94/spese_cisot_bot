@@ -28,9 +28,6 @@ def get_message(message):
 
         bot.set_state(user_id , MessageState.waiting_split_decision, chat_id)
         bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
-        with bot.retrieve_data(user_id, chat_id) as data:
-            data["timer"] = timer
-            data["row"] = row
 
         timer = threading.Timer(
             TIMEOUT_SECONDS,
@@ -38,6 +35,10 @@ def get_message(message):
             args=[chat_id, user_id, username]
         )
         timer.start()
+        
+        with bot.retrieve_data(user_id, chat_id) as data:
+            data["timer"] = timer
+            data["row"] = row
     else:
         handle_add_row(row, username, chat_id, user_id)
 
