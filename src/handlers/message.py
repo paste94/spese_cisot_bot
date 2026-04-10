@@ -1,5 +1,5 @@
 import threading
-from src.services.messages.message_state import MessageState
+from services.messages.message_state import MessageState
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import TIMEOUT_SECONDS
 from bot_instance import bot
