@@ -3,7 +3,7 @@
 import os
 from dotenv import load_dotenv
 from telebot import TeleBot, types
-from telebot.asyncio_storage import StateMemoryStorage
+from telebot.storage import StateMemoryStorage
 
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
