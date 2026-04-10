@@ -61,7 +61,7 @@ def get_message(message):
     handle_add_row(row, username, chat_id, user_id)
 
 def on_timeout(chat_id: str, user_id: str, username: str):
-    with bot.retrieve_data(user_id, username, chat_id) as data:
+    with bot.retrieve_data(user_id, chat_id) as data:
         row = data["row"]
     handle_add_row(row, username, chat_id, user_id)
 
