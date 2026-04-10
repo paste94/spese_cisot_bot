@@ -1,3 +1,4 @@
+import asyncio
 import threading
 from services.messages.message_state import MessageState
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -9,9 +10,9 @@ from services.users.users import USERS
 
 @bot.message_handler(func=lambda msg: True)
 @handle_errors(bot)
-def get_message(message):
+async def get_message(message):
     if not USERS.is_authorized(message.from_user.username):
-        bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
+        await bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
         return
 
     chat_id = message.chat.id
@@ -26,21 +27,24 @@ def get_message(message):
             InlineKeyboardButton("❌ No (Default)", callback_data="no")
         )
 
-        bot.set_state(user_id , MessageState.waiting_split_decision, chat_id)
-        bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
+        await bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
+        await bot.set_state(user_id , MessageState.waiting_split_decision, chat_id)
 
-        timer = threading.Timer(
-            TIMEOUT_SECONDS,
-            on_timeout,
-            args=[chat_id, user_id, username]
-        )
-        timer.start()
-        
-        with bot.retrieve_data(user_id, chat_id) as data:
-            data["timer"] = timer
+        # timer = threading.Timer(
+        #     TIMEOUT_SECONDS,
+        #     on_timeout,
+        #     args=[chat_id, user_id, username]
+        # )
+        # timer.start()
+
+        async with bot.retrieve_data(user_id, chat_id) as data:
+            # data["timer"] = timer
             data["row"] = row
+
+        asyncio.create_task(timeout_task(chat_id, user_id, username))
+
     else:
-        handle_add_row(row, username, chat_id, user_id)
+        await handle_add_row(row, username, chat_id, user_id)
 
 @bot.message_handler(state=MessageState.waiting_split_decision)
 @handle_errors(bot)
@@ -70,3 +74,14 @@ def handle_add_row(row, username, chat_id, user_id):
     add_row(row, username)
     bot.delete_state(user_id, chat_id)
     bot.send_message(chat_id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
+
+async def timeout_task(chat_id, user_id, username):
+    await asyncio.sleep(TIMEOUT_SECONDS)
+
+    # Controlla se l'utente ha già risposto
+    state = await bot.get_state(user_id, chat_id)
+    if state != MessageState.waiting_split_decision.name:
+        return  # Ha già risposto, non fare nulla
+
+    await bot.send_message(chat_id, "⏰ Tempo scaduto! Uso la risposta di default.")
+    await on_timeout(chat_id, user_id, username)
