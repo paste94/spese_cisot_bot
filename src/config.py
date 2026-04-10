@@ -1,6 +1,9 @@
+""" Configuration settings and constants for the bot. """
+
 CREDENTIALS_FILE = "g-sheet-credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 DIV_STRINGS = ['diviso', 'divisa', 'div', 'splittata', 'splittato', 'split']
+TIMEOUT_SECONDS = 30
 MONTH_NAMES = {
     1: "Gen",
     2: "Feb",

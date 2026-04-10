@@ -1,3 +1,5 @@
+""" Bot instance and Telegram API setup """
+
 import os
 from dotenv import load_dotenv
 from telebot import TeleBot, types

@@ -1,3 +1,5 @@
+""" Main module to start project """
+
 from bot_instance import bot
 
 import handlers.about

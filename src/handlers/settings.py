@@ -89,6 +89,7 @@ def get_message(message):
 def set_new_link_button(chat_id: str, username: str, user_id: str, update_current: bool):
     with bot.retrieve_data(user_id, chat_id) as data:
         link = data["link"]
+        data['link'] = None
     USERS.add_url_to_list(username, link, update_current=update_current)
     bot.send_message(chat_id, f'✅ Impostato nuovo sheet{" come default "if update_current else " "}correttamente.')
 

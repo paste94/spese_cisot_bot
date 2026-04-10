@@ -3,3 +3,4 @@ g-sheet-credentials.json
 __pycache__
 venv/
 users/users.json
+.vscode
