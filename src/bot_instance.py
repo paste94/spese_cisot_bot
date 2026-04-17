@@ -7,7 +7,6 @@ from telebot.storage import StateMemoryStorage
 
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-print(TOKEN)
 
 state_storage = StateMemoryStorage()
 bot = TeleBot(TOKEN, state_storage=state_storage)

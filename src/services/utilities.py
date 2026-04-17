@@ -21,11 +21,8 @@ def handle_errors(bot):
                 try:
                     logger.info("Invio messaggio di errore all'utente")
                     if args and hasattr(args[0], 'chat'):
-                        logger.info("Args: %s", args)
                         chat_id = args[0].chat.id
-                        logger.info("Chat ID: %s", chat_id)
                         bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
-                        logger.info("Messaggio di errore inviato")
                 except:
                     pass  # Se non riesce a mandare, ignora
                 
