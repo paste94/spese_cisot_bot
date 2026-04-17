@@ -1,7 +1,10 @@
 from functools import wraps
 import traceback
+import logging
 
 from config import DIV_STRINGS
+
+logger = logging.getLogger(__name__)
 
 def handle_errors(bot):
     def decorator(func):
@@ -12,13 +15,17 @@ def handle_errors(bot):
             except Exception as e:
                 # Log completo stacktrace
                 error_msg = f"❌ ERRORE in {func.__name__}:\n{str(e)}\n{traceback.format_exc()}"
-                print(error_msg)
+                logger.error(error_msg)
                 
                 # Manda messaggio errore all'utente (se disponibile)
                 try:
+                    logger.info("Invio messaggio di errore all'utente")
                     if args and hasattr(args[0], 'chat'):
+                        logger.info("Args: %s", args)
                         chat_id = args[0].chat.id
+                        logger.info("Chat ID: %s", chat_id)
                         bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
+                        logger.info("Messaggio di errore inviato")
                 except:
                     pass  # Se non riesce a mandare, ignora
                 
