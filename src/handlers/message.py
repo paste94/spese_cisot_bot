@@ -1,3 +1,4 @@
+import logging
 import threading
 from services.messages.message_state import MessageState
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -6,6 +7,8 @@ from bot_instance import bot
 from services.gsheet.utils import add_row
 from services.utilities import handle_errors, parse_message
 from services.users.users import USERS
+
+logger = logging.getLogger(__name__)
 
 active_timers: dict = {}
 
@@ -93,6 +96,7 @@ def on_timeout(chat_id: str, user_id: str, username: str, message_id: str):
 
 def handle_add_row(row, username, chat_id, user_id):
     cancel_timeout(user_id)
+    logger.info("Inizio add_row per utente %s", username)
     add_row(row, username)
     bot.delete_state(user_id, chat_id)
     bot.send_message(chat_id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")

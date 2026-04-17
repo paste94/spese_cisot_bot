@@ -1,5 +1,4 @@
-from gspread import authorize
-from google.oauth2.service_account import Credentials
+import gspread
 from config import CREDENTIALS_FILE, SCOPES
 
-CLIENT = authorize(Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES))
+CLIENT = gspread.service_account(filename=CREDENTIALS_FILE, scopes=SCOPES)
