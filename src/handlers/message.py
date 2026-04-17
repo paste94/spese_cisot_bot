@@ -15,31 +15,42 @@ active_timers: dict = {}
 @bot.message_handler(func=lambda msg: True)
 @handle_errors(bot)
 def get_message(message):
+    logger.info("Messaggio ricevuto da %s: %s", message.from_user.username, message.text)
     if not USERS.is_authorized(message.from_user.username):
         bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
         return
-
+    logger.info("Utente autorizzato")
     chat_id = message.chat.id
     user_id = message.from_user.id
     username = message.from_user.username
-
+    logger.info("Chat ID: %s", chat_id)
+    logger.info("User ID: %s", user_id)
+    logger.info("Username: %s", username)
     row = parse_message(message.text)
+    logger.info("Row: %s", row)
     if row['split'] == False:
+        logger.info("Split è False")
         markup = InlineKeyboardMarkup(row_width=2)
+        logger.info("Markup creato")
         markup.add(
             InlineKeyboardButton("✅ Sì", callback_data="si_split"),
             InlineKeyboardButton("❌ No (Default)", callback_data="no_split")
         )
+        logger.info("Bottoni aggiunti")
         
         sent = bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
+        logger.info("Messaggio inviato")
         bot.set_state(user_id , MessageState.waiting_split_decision, chat_id)
-
+        logger.info("State impostato")
         with bot.retrieve_data(user_id, chat_id) as data:
             # data["timer"] = timer
             data["row"] = row
+        logger.info("Data salvata")
 
         start_timeout(chat_id, user_id, username, TIMEOUT_SECONDS, sent.message_id)
+        logger.info("Timeout avviato")
     else:
+        logger.info("Split è True")
         handle_add_row(row, username, chat_id, user_id)
 
 @bot.callback_query_handler(func=lambda call: call.data in ["si_split", "no_split"])
