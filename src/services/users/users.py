@@ -1,7 +1,7 @@
 import json
 import os
 
-class Users:
+class _Users:
     def __init__(self) -> None:
         self.filename = 'users/users.json'
         self._last_mtime: float = 0.0
@@ -101,4 +101,5 @@ class Users:
 
         raise ValueError(f'User {username} not found')
 
+USERS = _Users()
 
