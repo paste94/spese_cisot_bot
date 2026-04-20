@@ -1,3 +1,4 @@
+from config import LOG_PATH
 from logging.handlers import TimedRotatingFileHandler
 from config import LOG_ERROR_FILENAME
 from config import LOG_FILENAME
@@ -11,7 +12,7 @@ def setup_logger():
 
     # Handler per log generale
     fh = TimedRotatingFileHandler(
-        LOG_FILENAME,
+        LOG_PATH / LOG_FILENAME,
         when="midnight",     # ruota a mezzanotte
         interval=1,          # ogni 1 giorno
         backupCount=7,       # mantiene 7 file, cancella i più vecchi
@@ -21,7 +22,7 @@ def setup_logger():
     fh.setFormatter(fmt)
 
     # Handler solo per errori
-    eh = logging.FileHandler(LOG_ERROR_FILENAME)
+    eh = logging.FileHandler(LOG_PATH / LOG_ERROR_FILENAME)
     eh.setLevel(logging.ERROR)
     eh.setFormatter(fmt)
 
