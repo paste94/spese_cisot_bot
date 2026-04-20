@@ -5,3 +5,4 @@ venv/
 users/users.json
 .vscode
 bot.log*
+log/
