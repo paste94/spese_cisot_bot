@@ -1,30 +1,16 @@
 # """ Main module to start project """
 
+from services.gsheet.utils import get_sheet_name
 from services.gsheet.utils import add_row
 from services.utilities import check_user
 from services.logger.logger import logger
 from services.utilities import handle_errors
 from bot_instance import bot
 from config import DIV_STRINGS
-import os
-import gspread
-from dotenv import load_dotenv
-from google.oauth2.service_account import Credentials
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.users.users import USERS
-from services.gsheet.exceptions import UnknownLinkError, MessageFormatNotSupported
+from services.gsheet.exceptions import MessageFormatNotSupported
 from collections import defaultdict
-from gspread import NoValidUrlKeyFound
-
-load_dotenv()
-
-# GET IT FROM BOTFATHER 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-# GET IT FROM GOOGLE SHEET API
-CREDENTIALS_FILE = "g-sheet-credentials.json"
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-CREDS = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
-CLIENT = gspread.authorize(CREDS)
 
 user_states = defaultdict(lambda: None)  # None, "waiting_link", "waiting_confirm"
 
@@ -52,34 +38,6 @@ def parse_message(message):
         'split': split,
     }
     return row
-
-# def add_row(row, username: str):
-#     now = datetime.now()
-#     month = MONTH_NAMES[now.month]
-#     # Gets right worksheet
-
-#     spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
-#     sheet = spreadsheet.worksheet(month)
-
-#     # Finds the first empty row
-#     cols = sheet.range(1, 1, sheet.row_count, 1)
-#     index  = [cell.value for cell in cols].index('')+1
-
-#     sheet.update_cell(index, 1, row['description'])
-#     sheet.update_cell(index, 2, now.day)
-#     sheet.update_cell(index, 3, row['price'])
-#     sheet.update_cell(index, 6, row['split'])
-
-def get_sheet_name(url: str) -> str:
-    try:
-        spreadsheet = CLIENT.open_by_url(url)
-        return spreadsheet.title
-    except Exception as e:
-        if isinstance(e, NoValidUrlKeyFound):
-            raise UnknownLinkError("Link Google Sheet non valido")
-        if isinstance(e, PermissionError):
-            raise PermissionError("Accesso negato allo Sheet. Per ottenerlo, accedere allo sheet e condividerlo con l'user del bot.")
-        raise e
 
 
 ### BUTTONS ###
@@ -126,16 +84,6 @@ def add_row_handler(message):
     add_row(row, message.from_user.username)
     logger.info("Row added to sheet")
     bot.send_message(message.chat.id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
-
-
-#%%
-
-# bot = telebot.TeleBot(TOKEN)
-# bot.set_my_commands([
-#     telebot.types.BotCommand("help", "🆘 Guida rapida"),
-#     telebot.types.BotCommand("about", "👀 Info sul bot"),
-#     telebot.types.BotCommand("settings", "⚙️ Impostazioni"),
-# ])
 
 # /help
 @bot.message_handler(commands=['help'])
