@@ -3,7 +3,7 @@
 # import logging
 # from logging.handlers import TimedRotatingFileHandler
 
-from bot_instance import bot
+# from bot_instance import bot
 
 # import handlers.about
 # import handlers.help
@@ -197,12 +197,12 @@ def add_row_handler(message):
 
 #%%
 
-# bot = telebot.TeleBot(TOKEN)
-# bot.set_my_commands([
-#     telebot.types.BotCommand("help", "🆘 Guida rapida"),
-#     telebot.types.BotCommand("about", "👀 Info sul bot"),
-#     telebot.types.BotCommand("settings", "⚙️ Impostazioni"),
-# ])
+bot = telebot.TeleBot(TOKEN)
+bot.set_my_commands([
+    telebot.types.BotCommand("help", "🆘 Guida rapida"),
+    telebot.types.BotCommand("about", "👀 Info sul bot"),
+    telebot.types.BotCommand("settings", "⚙️ Impostazioni"),
+])
 
 # /help
 @bot.message_handler(commands=['help'])
@@ -281,6 +281,4 @@ def get_message(message):
 def about_cmd(message):
     bot.send_message(message.chat.id, "🤖 Bot di esempio con suggerimenti di interazione.")
 
-if __name__ == '__main__':
-    # logger.info('Bot started...')
-    bot.infinity_polling()
+bot.infinity_polling()
