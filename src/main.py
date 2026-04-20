@@ -1,7 +1,8 @@
 # """ Main module to start project """
 
-# import logging
-# from logging.handlers import TimedRotatingFileHandler
+from services.utilities import check_user
+from services.logger.logger import logger
+from services.utilities import handle_errors
 
 from bot_instance import bot
 
@@ -9,31 +10,6 @@ from bot_instance import bot
 # import handlers.help
 # import handlers.message
 # import handlers.settings
-
-# # ── Logging con rotazione giornaliera (max 7 giorni) ─────────
-# LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-# LOG_DATE_FMT = "%Y-%m-%d %H:%M:%S"
-
-# root_logger = logging.getLogger()
-# root_logger.setLevel(logging.INFO)
-
-# # File handler: ruota ogni mezzanotte, tiene max 7 file
-# file_handler = TimedRotatingFileHandler(
-#     filename="bot.log",
-#     when="midnight",
-#     interval=1,
-#     backupCount=7,
-#     encoding="utf-8",
-# )
-# file_handler.setFormatter(logging.Formatter(LOG_FORMAT, datefmt=LOG_DATE_FMT))
-# root_logger.addHandler(file_handler)
-
-# # Console handler: per journalctl / stdout
-# console_handler = logging.StreamHandler()
-# console_handler.setFormatter(logging.Formatter(LOG_FORMAT, datefmt=LOG_DATE_FMT))
-# root_logger.addHandler(console_handler)
-
-# logger = logging.getLogger(__name__)
 
 # if __name__ == '__main__':
 #     logger.info('Bot started...')
@@ -46,9 +22,7 @@ from bot_instance import bot
 #%%
 from config import DIV_STRINGS, MONTH_NAMES
 import os
-import telebot
 import gspread
-import traceback
 
 from dotenv import load_dotenv
 from datetime import datetime
@@ -98,29 +72,6 @@ def parse_message(message):
         'split': split,
     }
     return row
-
-def handle_errors(bot):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                # Log completo stacktrace
-                error_msg = f"❌ ERRORE in {func.__name__}:\n{str(e)}\n{traceback.format_exc()}"
-                print(error_msg)
-                
-                # Manda messaggio errore all'utente (se disponibile)
-                try:
-                    if args and hasattr(args[0], 'chat'):
-                        chat_id = args[0].chat.id
-                        bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
-                except:
-                    pass  # Se non riesce a mandare, ignora
-                
-                return None
-        return wrapper
-    return decorator
 
 def add_row(row, username: str):
     now = datetime.now()
@@ -246,13 +197,10 @@ def about_cmd(message):
 @bot.callback_query_handler(func=lambda call: True)
 @handle_errors(bot)
 def handle_button_click(call):
-    if not USERS.is_authorized(call.from_user.username):
-        bot.reply_to(call.message, "❌ Non sei autorizzato a inviare messaggi.")
-        return
+    check_user(call.from_user)
     
     bot.answer_callback_query(call.id)
     chat_id = call.message.chat.id
-    old_url = USERS.get_old(call.from_user.username)
     if call.data == 'new': 
         add_sheet_button(chat_id)
     if call.data == 'si':
@@ -267,9 +215,7 @@ def handle_button_click(call):
 @bot.message_handler(func=lambda msg: True)
 @handle_errors(bot)
 def get_message(message):
-    if not USERS.is_authorized(message.from_user.username):
-        bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
-        return
+    check_user(message.from_user)
 
     chat_id = message.chat.id
     if user_states[chat_id] == "waiting_link":
@@ -282,5 +228,5 @@ def about_cmd(message):
     bot.send_message(message.chat.id, "🤖 Bot di esempio con suggerimenti di interazione.")
 
 if __name__ == '__main__':
-    # logger.info('Bot started...')
+    logger.info('Bot started...')
     bot.infinity_polling()

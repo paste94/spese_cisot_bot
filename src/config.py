@@ -20,4 +20,9 @@ MONTH_NAMES = {
     11: "Nov",
     12: "Dic"
 }
-LOG_PATH=Path.cwd() / "log" / "bot.log"
+# ── Logging con rotazione giornaliera (max 7 giorni) ─────────
+LOG_PATH=Path.cwd() / "log"
+LOG_FILENAME="bot.log"
+LOG_ERROR_FILENAME="error.log"
+LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+LOG_DATE_FMT = "%Y-%m-%d %H:%M:%S"

@@ -1,10 +1,11 @@
+from telebot.types import User
+from src.services.users.exceptions import UnauthorizedMessageError
+from services.users.users import USERS
+from services.logger.logger import logger
 from functools import wraps
-import traceback
-import logging
 
 from config import DIV_STRINGS
 
-logger = logging.getLogger(__name__)
 
 def handle_errors(bot):
     def decorator(func):
@@ -12,10 +13,21 @@ def handle_errors(bot):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
+            except UnauthorizedMessageError as e:
+                logger.warning(
+                    "Accesso non autorizzato — user='%s' telegram_id=%s",
+                    e.user_name,
+                    e.telegram_id,
+                    exc_info=False # No stacktrace per accessi non autorizzati
+                )
+
             except Exception as e:
-                # Log completo stacktrace
-                error_msg = f"❌ ERRORE in {func.__name__}:\n{str(e)}\n{traceback.format_exc()}"
-                logger.error(error_msg)
+                logger.error(
+                    "Errore in %s: %s",
+                    func.__qualname__,
+                    e,
+                    exc_info=True # Stacktrace completo
+                )
                 
                 # Manda messaggio errore all'utente (se disponibile)
                 try:
@@ -29,6 +41,10 @@ def handle_errors(bot):
                 return None
         return wrapper
     return decorator
+
+def check_user(user: User):
+    if not USERS.is_authorized(user.username):
+        raise UnauthorizedMessageError(user.username, user.id)
 
 def parse_message(message):
     tokens = message.strip().split(' ', 1)
