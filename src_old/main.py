@@ -244,7 +244,7 @@ def about_cmd(message):
     bot.send_message(message.chat.id, "Seleziona uno sheet", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
-@handle_errors(bot)
+@handle_errors
 def handle_button_click(call):
     if not USERS.is_authorized(call.from_user.username):
         bot.reply_to(call.message, "❌ Non sei autorizzato a inviare messaggi.")
@@ -265,7 +265,7 @@ def handle_button_click(call):
         switch_index_button(chat_id, call.from_user.username, int(call.data))
 
 @bot.message_handler(func=lambda msg: True)
-@handle_errors(bot)
+@handle_errors
 def get_message(message):
     if not USERS.is_authorized(message.from_user.username):
         bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")

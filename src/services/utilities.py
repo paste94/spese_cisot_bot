@@ -6,41 +6,40 @@ from functools import wraps
 
 from config import DIV_STRINGS
 
+from bot_instance import bot
 
-def handle_errors(bot):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
+def handle_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except UnauthorizedMessageError as e:
+            logger.warning(
+                "Accesso non autorizzato — user='%s' telegram_id=%s",
+                e.user_name,
+                e.telegram_id,
+                exc_info=False # No stacktrace per accessi non autorizzati
+            )
+
+        except Exception as e:
+            logger.error(
+                "Errore in %s: %s",
+                func.__qualname__,
+                e,
+                exc_info=True # Stacktrace completo
+            )
+            
+            # Manda messaggio errore all'utente (se disponibile)
             try:
-                return func(*args, **kwargs)
-            except UnauthorizedMessageError as e:
-                logger.warning(
-                    "Accesso non autorizzato — user='%s' telegram_id=%s",
-                    e.user_name,
-                    e.telegram_id,
-                    exc_info=False # No stacktrace per accessi non autorizzati
-                )
-
-            except Exception as e:
-                logger.error(
-                    "Errore in %s: %s",
-                    func.__qualname__,
-                    e,
-                    exc_info=True # Stacktrace completo
-                )
-                
-                # Manda messaggio errore all'utente (se disponibile)
-                try:
-                    logger.info("Invio messaggio di errore all'utente")
-                    if args and hasattr(args[0], 'chat'):
-                        chat_id = args[0].chat.id
-                        bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
-                except:
-                    pass  # Se non riesce a mandare, ignora
-                
-                return None
-        return wrapper
-    return decorator
+                logger.info("Invio messaggio di errore all'utente")
+                if args and hasattr(args[0], 'chat'):
+                    chat_id = args[0].chat.id
+                    bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
+            except:
+                pass  # Se non riesce a mandare, ignora
+            
+            return None
+    return wrapper
 
 def check_user(user: User):
     if not USERS.is_authorized(user.username):
@@ -70,6 +69,13 @@ def parse_message(message):
         'split': split,
     }
     return row
+
+def send_typing_action(func):
+    @wraps(func)
+    def wrapper(message, *args, **kwargs):
+        bot.send_chat_action(message.chat.id, "typing")
+        return func(message, *args, **kwargs)
+    return wrapper
 
 class MessageFormatNotSupported(Exception):
     """Errore conversione float personalizzato"""

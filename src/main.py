@@ -1,5 +1,6 @@
 # """ Main module to start project """
 
+from services.utilities import send_typing_action
 from services.gsheet.utils import get_sheet_name
 from services.gsheet.utils import add_row
 from services.utilities import check_user
@@ -87,7 +88,7 @@ def add_row_handler(message):
 
 # /help
 @bot.message_handler(commands=['help'])
-@handle_errors(bot)
+@handle_errors
 def help_cmd(message):
     check_user(message.from_user)
     logger.info("Help command received from user %s", message.from_user.username)
@@ -128,7 +129,7 @@ def about_cmd(message):
     bot.send_message(message.chat.id, "Seleziona uno sheet", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
-@handle_errors(bot)
+@handle_errors
 def handle_button_click(call):
     check_user(call.from_user)
     logger.info("Button click received from user %s: %s", call.from_user.username, call.data)   
@@ -146,7 +147,8 @@ def handle_button_click(call):
         switch_index_button(chat_id, call.from_user.username, int(call.data))
 
 @bot.message_handler(func=lambda msg: True)
-@handle_errors(bot)
+@handle_errors
+@send_typing_action
 def get_message(message):
     check_user(message.from_user)
     logger.info("Message received from user %s: \"%s\"", message.from_user.username, message.text)
