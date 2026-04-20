@@ -1,5 +1,5 @@
+from services.logger.logger import logger
 import time
-import logging
 
 from gspread import NoValidUrlKeyFound
 from config import MONTH_NAMES
@@ -7,8 +7,6 @@ from services.gsheet.client import CLIENT
 from services.gsheet.exceptions import UnknownLinkError
 from services.users.users import USERS
 from datetime import datetime
-
-logger = logging.getLogger(__name__)
 
 # ── Cache nomi sheet (TTL 5 minuti) ──────────────────────────
 _sheet_name_cache: dict = {}   # url -> (name, timestamp)
@@ -46,19 +44,15 @@ def add_row(row, username: str):
     now = datetime.now()
     month = MONTH_NAMES[now.month]
 
-    # ① + ② API calls: apre spreadsheet e worksheet
     spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
     sheet = spreadsheet.worksheet(month)
 
-    # ③ API call: trova la prima riga vuota (col_values è più leggero di range)
     col_values = sheet.col_values(1)
     try:
         index = col_values.index('') + 1
     except ValueError:
-        # Nessuna cella vuota trovata → aggiungi dopo l'ultima riga
         index = len(col_values) + 1
 
-    # ④ API call UNICA: aggiorna tutte e 4 le celle in un solo batch
     sheet.batch_update([
         {'range': f'A{index}', 'values': [[row['description']]]},
         {'range': f'B{index}', 'values': [[now.day]]},

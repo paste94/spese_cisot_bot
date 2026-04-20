@@ -1,36 +1,16 @@
 # """ Main module to start project """
 
+from services.gsheet.utils import add_row
 from services.utilities import check_user
 from services.logger.logger import logger
 from services.utilities import handle_errors
-
 from bot_instance import bot
-
-# import handlers.about
-# import handlers.help
-# import handlers.message
-# import handlers.settings
-
-# if __name__ == '__main__':
-#     logger.info('Bot started...')
-#     bot.infinity_polling(
-#         timeout=20,
-#         long_polling_timeout=20,
-#         allowed_updates=['message', 'callback_query'],
-#     )
-
-#%%
-from config import DIV_STRINGS, MONTH_NAMES
+from config import DIV_STRINGS
 import os
 import gspread
-
 from dotenv import load_dotenv
-from datetime import datetime
-from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
-from googleapiclient.errors import HttpError
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from functools import wraps
 from services.users.users import USERS
 from services.gsheet.exceptions import UnknownLinkError, MessageFormatNotSupported
 from collections import defaultdict
@@ -73,22 +53,22 @@ def parse_message(message):
     }
     return row
 
-def add_row(row, username: str):
-    now = datetime.now()
-    month = MONTH_NAMES[now.month]
-    # Gets right worksheet
+# def add_row(row, username: str):
+#     now = datetime.now()
+#     month = MONTH_NAMES[now.month]
+#     # Gets right worksheet
 
-    spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
-    sheet = spreadsheet.worksheet(month)
+#     spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
+#     sheet = spreadsheet.worksheet(month)
 
-    # Finds the first empty row
-    cols = sheet.range(1, 1, sheet.row_count, 1)
-    index  = [cell.value for cell in cols].index('')+1
+#     # Finds the first empty row
+#     cols = sheet.range(1, 1, sheet.row_count, 1)
+#     index  = [cell.value for cell in cols].index('')+1
 
-    sheet.update_cell(index, 1, row['description'])
-    sheet.update_cell(index, 2, now.day)
-    sheet.update_cell(index, 3, row['price'])
-    sheet.update_cell(index, 6, row['split'])
+#     sheet.update_cell(index, 1, row['description'])
+#     sheet.update_cell(index, 2, now.day)
+#     sheet.update_cell(index, 3, row['price'])
+#     sheet.update_cell(index, 6, row['split'])
 
 def get_sheet_name(url: str) -> str:
     try:
