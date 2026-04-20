@@ -142,7 +142,9 @@ def new_link_handler(message: str):
 
 def add_row_handler(message):
     row = parse_message(message.text)
+    logger.info("Row parsed: %s", row)
     add_row(row, message.from_user.username)
+    logger.info("Row added to sheet")
     bot.send_message(message.chat.id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
 
 
@@ -219,7 +221,7 @@ def handle_button_click(call):
 @handle_errors(bot)
 def get_message(message):
     check_user(message.from_user)
-    logger.info("Message received from user %s: %s", message.from_user.username, message.text)
+    logger.info("Message received from user %s: \"%s\"", message.from_user.username, message.text)
     chat_id = message.chat.id
     if user_states[chat_id] == "waiting_link":
         new_link_handler(message)
