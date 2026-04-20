@@ -1,43 +1,17 @@
 # """ Main module to start project """
 
-from services.utilities import send_upload_document_action, check_user, handle_errors
+from services.messages.utils import parse_message
+from services.users.utils import check_user
+from services.utilities import send_upload_document_action, handle_errors
 from services.gsheet.utils import get_sheet_name
 from services.gsheet.utils import add_row
 from services.logger.logger import logger
 from bot_instance import bot
-from config import DIV_STRINGS
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.users.users import USERS
-from services.gsheet.exceptions import MessageFormatNotSupported
 from collections import defaultdict
 
 user_states = defaultdict(lambda: None)  # None, "waiting_link", "waiting_confirm"
-
-def parse_message(message):
-    tokens = message.strip().split(' ', 1)
-    try: 
-        price = float(tokens[0].replace(',', '.'))
-    except ValueError as e:
-        if "could not convert string to float" in str(e):
-            raise MessageFormatNotSupported(f"Impossibile convertire '{tokens[0].replace(',', '.')}' in numero. Il formato corretto è <NUMERO> <DESCRIZIONE> <Diviso?>") 
-
-    try:
-        if tokens[1].lower().endswith(tuple(DIV_STRINGS)):
-            split = True
-        else:
-            split = False
-        description = tokens[1].replace('diviso', '').replace(',','').strip()
-    except ValueError as e:
-        if "list index out of range" in str(e):
-            raise MessageFormatNotSupported(f"Descriziona mancante. Il formato corretto è <NUMERO> <DESCRIZIONE> <Diviso?>") 
-
-    row = {
-        'price': price,
-        'description': description,
-        'split': split,
-    }
-    return row
-
 
 ### BUTTONS ###
 def add_sheet_button(chat_id: str):
