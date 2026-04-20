@@ -1,5 +1,7 @@
 """ Configuration settings and constants for the bot. """
 
+from pathlib import Path
+
 CREDENTIALS_FILE = "g-sheet-credentials.json"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 DIV_STRINGS = ['diviso', 'divisa', 'div', 'splittata', 'splittato', 'split']
@@ -18,3 +20,4 @@ MONTH_NAMES = {
     11: "Nov",
     12: "Dic"
 }
+LOG_PATH=Path.cwd() / "log" / "bot.log"
