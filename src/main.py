@@ -57,7 +57,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.errors import HttpError
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from functools import wraps
-from users.users import Users
+from services.users import Users
 from my_exceptions import MessageFormatNotSupported, UnknownLLinkError
 from collections import defaultdict
 from gspread import NoValidUrlKeyFound
