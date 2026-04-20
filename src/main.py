@@ -157,7 +157,10 @@ def add_row_handler(message):
 
 # /help
 @bot.message_handler(commands=['help'])
+@handle_errors(bot)
 def help_cmd(message):
+    check_user(message.from_user)
+    logger.info("Help command received from user %s", message.from_user.username)
     bot.send_message(
         message.chat.id,
         """ℹ️ Per aggiungere una spesa, invia un messaggio nel formato:
@@ -169,15 +172,15 @@ def help_cmd(message):
 # /about
 @bot.message_handler(commands=['about'])
 def about_cmd(message):
+    check_user(message.from_user)
+    logger.info("About command received from user %s", message.from_user.username)
     bot.send_message(message.chat.id, "🤖 Bot Cisottiano per la gestione delle spese in famiglia. Se non sei un Cisot non dovresti stare qui.")
 
 # /settings
 @bot.message_handler(commands=['settings'])
 def about_cmd(message):
-    if not USERS.is_authorized(message.from_user.username):
-        bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
-        return
-
+    check_user(message.from_user)
+    logger.info("Settings command received from user %s", message.from_user.username)
     current_url = USERS.get_url(message.from_user.username)
     old_url = USERS.get_old(message.from_user.username)
     markup = InlineKeyboardMarkup(row_width=2)
@@ -198,7 +201,7 @@ def about_cmd(message):
 @handle_errors(bot)
 def handle_button_click(call):
     check_user(call.from_user)
-    
+    logger.info("Button click received from user %s: %s", call.from_user.username, call.data)   
     bot.answer_callback_query(call.id)
     chat_id = call.message.chat.id
     if call.data == 'new': 
@@ -216,7 +219,7 @@ def handle_button_click(call):
 @handle_errors(bot)
 def get_message(message):
     check_user(message.from_user)
-
+    logger.info("Message received from user %s: %s", message.from_user.username, message.text)
     chat_id = message.chat.id
     if user_states[chat_id] == "waiting_link":
         new_link_handler(message)
@@ -225,6 +228,8 @@ def get_message(message):
 
 @bot.message_handler(commands=['about'])
 def about_cmd(message):
+    check_user(message.from_user)
+    logger.info("About command received from user %s", message.from_user.username)
     bot.send_message(message.chat.id, "🤖 Bot di esempio con suggerimenti di interazione.")
 
 if __name__ == '__main__':
