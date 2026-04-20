@@ -58,7 +58,7 @@ from googleapiclient.errors import HttpError
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from functools import wraps
 from services.users.users import USERS
-from my_exceptions import MessageFormatNotSupported, UnknownLLinkError
+from services.gsheet.exceptions import UnknownLinkError, MessageFormatNotSupported
 from collections import defaultdict
 from gspread import NoValidUrlKeyFound
 
@@ -145,7 +145,7 @@ def get_sheet_name(url: str) -> str:
         return spreadsheet.title
     except Exception as e:
         if isinstance(e, NoValidUrlKeyFound):
-            raise UnknownLLinkError("Link Google Sheet non valido")
+            raise UnknownLinkError("Link Google Sheet non valido")
         if isinstance(e, PermissionError):
             raise PermissionError("Accesso negato allo Sheet. Per ottenerlo, accedere allo sheet e condividerlo con l'user del bot.")
         raise e
