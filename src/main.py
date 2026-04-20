@@ -1,11 +1,9 @@
 # """ Main module to start project """
 
-from services.utilities import send_typing_action
+from services.utilities import send_typing_action, check_user, handle_errors
 from services.gsheet.utils import get_sheet_name
 from services.gsheet.utils import add_row
-from services.utilities import check_user
 from services.logger.logger import logger
-from services.utilities import handle_errors
 from bot_instance import bot
 from config import DIV_STRINGS
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
