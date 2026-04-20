@@ -1,7 +1,6 @@
 # """ Main module to start project """
 
-from src.services.utilities import send_upload_document_action
-from services.utilities import send_typing_action, check_user, handle_errors
+from services.utilities import send_upload_document_action, check_user, handle_errors
 from services.gsheet.utils import get_sheet_name
 from services.gsheet.utils import add_row
 from services.logger.logger import logger
