@@ -70,10 +70,10 @@ def parse_message(message):
     }
     return row
 
-def send_typing_action(func):
+def send_upload_document_action(func):
     @wraps(func)
     def wrapper(message, *args, **kwargs):
-        bot.send_chat_action(message.chat.id, "typing")
+        bot.send_chat_action(message.chat.id, "upload_document")
         return func(message, *args, **kwargs)
     return wrapper
 

@@ -1,5 +1,6 @@
 # """ Main module to start project """
 
+from src.services.utilities import send_upload_document_action
 from services.utilities import send_typing_action, check_user, handle_errors
 from services.gsheet.utils import get_sheet_name
 from services.gsheet.utils import add_row
@@ -146,7 +147,7 @@ def handle_button_click(call):
 
 @bot.message_handler(func=lambda msg: True)
 @handle_errors
-@send_typing_action
+@send_upload_document_action
 def get_message(message):
     check_user(message.from_user)
     logger.info("Message received from user %s: \"%s\"", message.from_user.username, message.text)
