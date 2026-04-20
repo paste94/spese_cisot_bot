@@ -57,14 +57,13 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.errors import HttpError
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from functools import wraps
-from services.users import Users
+from services.users import USERS
 from my_exceptions import MessageFormatNotSupported, UnknownLLinkError
 from collections import defaultdict
 from gspread import NoValidUrlKeyFound
 
 load_dotenv()
 
-USERS=Users()
 # GET IT FROM BOTFATHER 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # GET IT FROM GOOGLE SHEET API
