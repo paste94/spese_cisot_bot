@@ -1,0 +1,46 @@
+https://www.perplexity.ai/search/ho-un-bot-telegram-sul-raspber-3vnMyZ7WS0.4Er1u_pA7Mg
+
+Sì, StateMemoryStorage è quasi certamente la causa. Guardando il codice sorgente di telebot, il problema è strutturale.
+
+Il problema reale di StateMemoryStorage
+Il dizionario interno accumula stati di tutti gli utenti che hanno interagito col bot e non li pulisce mai automaticamente. Ogni accesso allo stato (lettura/scrittura) acquisisce un lock globale. Col tempo, con thread di polling che girano in parallelo, si creano contese su questo lock che rallentano tutto — senza però impattare CPU o RAM in modo visibile.
+
+Soluzione 1: Pulire periodicamente gli stati (fix rapido)
+Aggiungi una funzione che svuota gli stati ogni tot ore. Puoi schedularlo con un thread in background:
+
+python
+import threading
+import time
+from telebot.storage import StateMemoryStorage
+
+storage = StateMemoryStorage()
+bot = telebot.TeleBot("TOKEN", state_storage=storage)
+
+def clean_storage():
+    while True:
+        time.sleep(3600)  # ogni ora
+        storage.data.clear()  # svuota tutti gli stati
+        logger.info("State storage pulito")
+
+cleaner = threading.Thread(target=clean_storage, daemon=True)
+cleaner.start()
+Soluzione 2: Migrare a Redis (fix definitivo)
+Se hai Redis installato sul Pi, usa StateRedisStorage che è thread-safe by design e non accumula nulla in memoria:
+
+bash
+sudo apt install redis-server
+pip install redis
+python
+from telebot.storage import StateRedisStorage
+
+storage = StateRedisStorage(host='localhost', port=6379, db=0)
+bot = telebot.TeleBot("TOKEN", state_storage=storage)
+Soluzione 3: Non usare lo storage se non serve
+Se gli stati ti servono solo durante una conversazione attiva e non per persistenza tra riavvii, valuta di gestirli manualmente con un semplice dizionario che pulisci tu stesso alla fine di ogni conversazione:
+
+python
+user_states = {}  # {chat_id: stato}
+
+# Alla fine di ogni flusso:
+user_states.pop(message.chat.id, None)
+Consiglio pratico: inizia con la Soluzione 1 — è 5 righe di codice e non richiede nulla di nuovo. Se il bot regge per giorni senza rallentare, problema risolto. Altrimenti passa a Redis.
