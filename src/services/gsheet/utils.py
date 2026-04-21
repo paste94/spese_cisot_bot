@@ -43,22 +43,30 @@ def add_row(row, username: str):
 
     now = datetime.now()
     month = MONTH_NAMES[now.month]
+    logger.info("MONTH: %s", month)
 
     spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
+    logger.info("SPREADSHEET URL: %s", spreadsheet)
+
     sheet = spreadsheet.worksheet(month)
+    logger.info("WORKSHEET NAME: %s", sheet)
 
     col_values = sheet.col_values(1)
+    logger.info("COL VALUES: %s", col_values)
     try:
         index = col_values.index('') + 1
     except ValueError:
         index = len(col_values) + 1
+    logger.info("INXED: %s", index)
 
+    logger.info("WAIT FOR LOAD...")
     sheet.batch_update([
         {'range': f'A{index}', 'values': [[row['description']]]},
         {'range': f'B{index}', 'values': [[now.day]]},
         {'range': f'C{index}', 'values': [[row['price']]]},
         {'range': f'F{index}', 'values': [[row['split']]]},
     ])
+    logger.info("LOAD COMPLETED")
 
     elapsed = time.time() - start
     logger.info("add_row completata in %.2fs (riga %d)", elapsed, index)
