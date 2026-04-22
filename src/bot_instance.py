@@ -13,6 +13,13 @@ from services.logger.logger import logger
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
+# Crea un adapter con MAX 1 connessione nel pool
+adapter = HTTPAdapter(pool_connections=1, pool_maxsize=1)
+
+# Applica all'inizio, prima di creare il bot
+session = requests.Session()
+session.mount('https://', adapter)
+
 apihelper.SESSION_TIME_TO_LIVE = 5 * 60  # ricrea la sessione ogni 5 minuti
 
 state_storage = StateMemoryStorage()
