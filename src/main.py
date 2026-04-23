@@ -1,6 +1,7 @@
 # """ Main module to start project """
 
 from datetime import datetime
+import time
 
 from services.messages.utils import parse_message
 from services.users.utils import check_user
@@ -124,8 +125,20 @@ def handle_button_click(call):
 # @handle_errors
 # @send_upload_document_action
 def get_message(message):
-    logger.info("message sent: %s; Message processed: %s", str(message.date), str(datetime.now()))
+    receive_delay = time.time() - message.date
+    logger.info(
+        "📥 Messaggio ricevuto da @%s | Ritardo polling: %.2fs",
+        message.from_user.username,
+        receive_delay
+    )
+    t0 = time.time()
     bot.send_message(message.chat.id, f"PISELLO: {message.text}")
+    t1 = time.time()
+    logger.info(
+        "📥 Messaggio inoltrato a @%s | Ritardo invio: %.2fs",
+        message.from_user.username,
+        t1-t0
+    )
     # check_user(message.from_user)
     # logger.info("Message received from user %s: \"%s\"", message.from_user.username, message.text)
     # chat_id = message.chat.id
