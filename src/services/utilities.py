@@ -1,3 +1,5 @@
+import time
+
 from services.users.exceptions import UnauthorizedMessageError
 from services.logger.logger import logger
 from functools import wraps
@@ -31,7 +33,13 @@ def handle_errors(func):
                 logger.info("Invio messaggio di errore all'utente")
                 if args and hasattr(args[0], 'chat'):
                     chat_id = args[0].chat.id
+                    t0 = time.time()
                     bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
+                    t1 = time.time()
+                    logger.info(
+                        "📥 Messaggio ERRORE inoltrato | Ritardo invio: %.2fs",
+                        t1-t0
+                    )
             except:
                 pass  # Se non riesce a mandare, ignora
             

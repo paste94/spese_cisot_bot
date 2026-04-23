@@ -122,8 +122,8 @@ def handle_button_click(call):
         switch_index_button(chat_id, call.from_user.username, int(call.data))
 
 @bot.message_handler(func=lambda msg: True)
-# @handle_errors
-# @send_upload_document_action
+@handle_errors
+@send_upload_document_action
 def get_message(message):
     receive_delay = time.time() - message.date
     logger.info(
@@ -131,6 +131,21 @@ def get_message(message):
         message.from_user.username,
         receive_delay
     )
+
+
+
+
+    check_user(message.from_user)
+    logger.info("Message received from user %s: \"%s\"", message.from_user.username, message.text)
+    chat_id = message.chat.id
+    if user_states[chat_id] == "waiting_link":
+        new_link_handler(message)
+    else:
+        add_row_handler(message)
+    
+
+
+
     t0 = time.time()
     bot.send_message(message.chat.id, f"PISELLO: {message.text}")
     t1 = time.time()
@@ -139,13 +154,7 @@ def get_message(message):
         message.from_user.username,
         t1-t0
     )
-    # check_user(message.from_user)
-    # logger.info("Message received from user %s: \"%s\"", message.from_user.username, message.text)
-    # chat_id = message.chat.id
-    # if user_states[chat_id] == "waiting_link":
-    #     new_link_handler(message)
-    # else:
-    #     add_row_handler(message)
+    
 
 @bot.message_handler(commands=['about'])
 def about_cmd(message):
