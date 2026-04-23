@@ -22,7 +22,9 @@ adapter = HTTPAdapter(pool_connections=1, pool_maxsize=1)
 session = requests.Session()
 session.mount('https://', adapter)
 
-apihelper.SESSION_TIME_TO_LIVE = 5 * 60  # ricrea la sessione ogni 5 minuti
+apihelper.SESSION_TIME_TO_LIVE = 5 * 60
+apihelper.READ_TIMEOUT = 5      # 5s invece di 25s
+apihelper.CONNECT_TIMEOUT = 3   # 3s per il connect
 
 state_storage = StateMemoryStorage()
 
