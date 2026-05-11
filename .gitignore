@@ -4,4 +4,6 @@ __pycache__
 venv/
 users/users.json
 .vscode
+bot.log
 bot.log*
+log/

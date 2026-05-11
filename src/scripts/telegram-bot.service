@@ -5,11 +5,11 @@ After=network.target
 
 [Service]
 WorkingDirectory=/home/pi/Applications/spese_cisot_bot
-ExecStart=/home/pi/Applications/spese_cisot_bot/run.sh
+ExecStart=/home/pi/Applications/spese_cisot_bot/src/scripts/run.sh
 Restart=always
 RestartSec=5
-StandardOutput=append:/home/pi/Applications/spese_cisot_bot/bot.log
-StandardError=append:/home/pi/Applications/spese_cisot_bot/bot.log
+#StandardOutput=append:/home/pi/Applications/spese_cisot_bot/log/bot.log
+#StandardError=append:/home/pi/Applications/spese_cisot_bot/log/error_bot.log
 
 [Install]
 WantedBy=default.target

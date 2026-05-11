@@ -7,6 +7,7 @@ from telebot.storage import StateMemoryStorage
 from requests.adapters import HTTPAdapter
 import requests
 import telebot.apihelper as apihelper
+import threading
 
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -24,6 +25,21 @@ apihelper.READ_TIMEOUT = 5      # 5s invece di 25s
 apihelper.CONNECT_TIMEOUT = 3   # 3s per il connect
 
 state_storage = StateMemoryStorage()
+
+def clean_storage():
+    try:
+        while True:
+            time.sleep(3600)  # ogni ora
+            state_storage.data.clear()  # svuota tutti gli stati
+            logger.info("State storage pulito")
+    except Exception as e:
+        logger.error("Errore durante la pulizia dello storage: %s", e)
+
+
+cleaner = threading.Thread(target=clean_storage, daemon=True)
+cleaner.start()
+
+
 bot = TeleBot(TOKEN, state_storage=state_storage)
 bot.set_my_commands([
     types.BotCommand("help", "🆘 Guida rapida"),
