@@ -8,6 +8,10 @@ from requests.adapters import HTTPAdapter
 import requests
 import telebot.apihelper as apihelper
 import threading
+import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")

@@ -34,6 +34,18 @@ class _Users:
         
         raise ValueError(f'User {username} not found')
 
+    def get_split_url(self, username: str) -> str:
+        """
+        Recupera l'url corrente per split
+        """
+        self._reload_if_changed()
+        
+        for user in self._data['USER_LIST']:
+            if user['USERNAME'] == username:
+                return user['SHARED_URL']
+        
+        raise ValueError(f'User {username} not found')
+
     def get_old(self, username: str) -> list:
         """
         Recupera tutti gli url old

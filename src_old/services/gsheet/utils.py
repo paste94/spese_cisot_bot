@@ -1,3 +1,4 @@
+from src_old.model.row import Row
 import time
 import logging
 
@@ -39,32 +40,45 @@ def get_sheet_name(url: str) -> str:
             )
         raise e
 
-def add_row(row, username: str):
+def add_row(row: Row, username: str):
     """Aggiunge una riga allo sheet usando solo 3 chiamate API (prima erano 7)."""
-    start = time.time()
+    try : 
+        start = time.time()
 
-    now = datetime.now()
-    month = MONTH_NAMES[now.month]
+        now = datetime.now()
+        month = MONTH_NAMES[now.month]
 
-    # ① + ② API calls: apre spreadsheet e worksheet
-    spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
-    sheet = spreadsheet.worksheet(month)
+        if row.split:
+            # ① + ② API calls: apre spreadsheet e worksheet
+            spreadsheet = CLIENT.open_by_url(USERS.get_split_url(username))
+        else:
+        # ① + ② API calls: apre spreadsheet e worksheet
+            spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
+        sheet = spreadsheet.worksheet(month)
 
-    # ③ API call: trova la prima riga vuota (col_values è più leggero di range)
-    col_values = sheet.col_values(1)
-    try:
-        index = col_values.index('') + 1
-    except ValueError:
-        # Nessuna cella vuota trovata → aggiungi dopo l'ultima riga
-        index = len(col_values) + 1
+        # ③ API call: trova la prima riga vuota (col_values è più leggero di range)
+        col_values = sheet.col_values(1)
+        try:
+            index = col_values.index('') + 1
+        except ValueError:
+            # Nessuna cella vuota trovata → aggiungi dopo l'ultima riga
+            index = len(col_values) + 1
 
-    # ④ API call UNICA: aggiorna tutte e 4 le celle in un solo batch
-    sheet.batch_update([
-        {'range': f'A{index}', 'values': [[row['description']]]},
-        {'range': f'B{index}', 'values': [[now.day]]},
-        {'range': f'C{index}', 'values': [[row['price']]]},
-        {'range': f'F{index}', 'values': [[row['split']]]},
-    ])
+        if row.split:
+            sheet.batch_update([
+                {'range': f'A{index}', 'values': [[row.description]]},
+                {'range': f'B{index}', 'values': [[now.day]]},
+                {'range': f'E{index}', 'values': [[row.price]]},
+            ])
+        else:
+            # ④ API call UNICA: aggiorna tutte e 4 le celle in un solo batch
+            sheet.batch_update([
+                {'range': f'A{index}', 'values': [[row.description]]},
+                {'range': f'B{index}', 'values': [[now.day]]},
+                {'range': f'C{index}', 'values': [[row.price]]},
+            ])
 
-    elapsed = time.time() - start
-    logger.info("add_row completata in %.2fs (riga %d)", elapsed, index)
+    finally:
+        CLIENT.http_client.session.close()
+        elapsed = time.time() - start
+        logger.info("add_row completata in %.2fs (riga %d)", elapsed, index)

@@ -1,3 +1,5 @@
+from services.gsheet.utils import add_row_personal
+from src_old.model.row import Row
 import logging
 import threading
 from services.messages.message_state import MessageState
@@ -21,8 +23,8 @@ def get_message(message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     username = message.from_user.username
-    row = parse_message(message.text)
-    if row['split'] == False:
+    row: Row = parse_message(message.text)
+    if row.split == False:
         markup = InlineKeyboardMarkup(row_width=2)
         markup.add(
             InlineKeyboardButton("✅ Sì", callback_data="si_split"),
@@ -91,12 +93,12 @@ def on_timeout(chat_id: str, user_id: str, username: str, message_id: str):
     )
     handle_add_row(row, username, chat_id, user_id)
 
-def handle_add_row(row, username, chat_id, user_id):
+def handle_add_row(row: Row, username: str, chat_id: str, user_id: str):
     cancel_timeout(user_id)
     logger.info("Inizio add_row per utente %s", username)
     add_row(row, username)
     bot.delete_state(user_id, chat_id)
-    bot.send_message(chat_id, f"✅ Spesa aggiunta: {row['description']} - {row['price']}€ {'(diviso)' if row['split'] else ''}")
+    bot.send_message(chat_id, f"✅ Spesa aggiunta: {row.description} - {row.price}€ {'CONDIVISO' if row.split else 'PERSONALE'}")
 
 def start_timeout(chat_id, user_id, username, seconds, message_id):
     # Cancella eventuale timer precedente

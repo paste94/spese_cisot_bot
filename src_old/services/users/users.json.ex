@@ -3,7 +3,8 @@
         {
             "USERNAME":"RicPast",
             "GSHEET_URL":"https://docs.google.com/spreadsheets/d/1yoxWN_bRS72kvwrgIGEyo-Qq_Mr8oXNNme4FOQjD_hU/edit?gid=94192932#gid=94192932",
-            "GSHEET_OLD":[]
+            "GSHEET_OLD":[],
+            "SHARED_URL": "https://docs.google.com/spreadsheets/d/1yoxWN_bRS72kvwrgIGEyo-Qq_Mr8oXNNme4FOQjD_hU/edit?gid=94192932"
         }
     ]
 }

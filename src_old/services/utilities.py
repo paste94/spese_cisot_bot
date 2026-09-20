@@ -1,3 +1,4 @@
+from src_old.model.row import Row
 from functools import wraps
 import traceback
 import logging
@@ -30,7 +31,7 @@ def handle_errors(bot):
         return wrapper
     return decorator
 
-def parse_message(message):
+def parse_message(message: str) -> Row:
     tokens = message.strip().split(' ', 1)
     try: 
         price = float(tokens[0].replace(',', '.'))
@@ -48,12 +49,7 @@ def parse_message(message):
         if "list index out of range" in str(e):
             raise MessageFormatNotSupported(f"Descriziona mancante. Il formato corretto è <NUMERO> <DESCRIZIONE> <Diviso?>") 
 
-    row = {
-        'price': price,
-        'description': description,
-        'split': split,
-    }
-    return row
+    return Row(price, description, split)
 
 class MessageFormatNotSupported(Exception):
     """Errore conversione float personalizzato"""
