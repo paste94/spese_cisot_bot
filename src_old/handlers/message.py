@@ -1,4 +1,4 @@
-from services.gsheet.utils import add_row_personal
+from services.gsheet.utils import add_row
 from model.row import Row
 import logging
 import threading
