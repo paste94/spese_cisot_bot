@@ -78,6 +78,9 @@ def add_row(row: Row, username: str):
                 {'range': f'C{index}', 'values': [[row.price]]},
             ])
 
+    except PermissionError as e:
+        logger.error("Errore di permessi")
+        raise PermissionError("Accesso negato allo Sheet. Per ottenerlo, accedere allo sheet e condividerlo con l'user del bot.") from e
     finally:
         CLIENT.http_client.session.close()
         elapsed = time.time() - start
