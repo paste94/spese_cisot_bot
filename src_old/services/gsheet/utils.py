@@ -81,4 +81,4 @@ def add_row(row: Row, username: str):
     finally:
         CLIENT.http_client.session.close()
         elapsed = time.time() - start
-        logger.info("add_row completata in %.2fs (riga %d)", elapsed, index)
+        logger.info("add_row completata in %.2fs (riga %d)", elapsed)
