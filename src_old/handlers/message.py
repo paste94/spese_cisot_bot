@@ -49,7 +49,7 @@ def handle_split_response(call):
         row = data.get("row")
 
     if call.data == "si_split":
-        row["split"] = True
+        row.split = True
     
     bot.edit_message_text(
         chat_id=call.message.chat.id,
