@@ -1,5 +1,5 @@
 from services.gsheet.utils import add_row_personal
-from src_old.model.row import Row
+from model.row import Row
 import logging
 import threading
 from services.messages.message_state import MessageState
