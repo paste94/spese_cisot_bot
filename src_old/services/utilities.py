@@ -24,6 +24,9 @@ def handle_errors(bot):
                     if args and hasattr(args[0], 'chat'):
                         chat_id = args[0].chat.id
                         bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
+                    if args and hasattr(args[0], 'from_user'):
+                        chat_id = args[0].from_user.id
+                        bot.send_message(chat_id, f"❌ Errore interno: {str(e)}")
                 except Exception as e:
                     logger.error(f"Impossibile inviare messaggio di errore all'utente {args[0].chat.id}: {str(e)}")
                 
