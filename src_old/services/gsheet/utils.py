@@ -1,10 +1,13 @@
+import gspread
+from config import SCOPES
+from config import CREDENTIALS_FILE
 from model.row import Row
 import time
 import logging
 
 from gspread import NoValidUrlKeyFound
 from config import MONTH_NAMES
-from services.gsheet.client import CLIENT
+# from services.gsheet.client import CLIENT
 from services.gsheet.exceptions import UnknownLinkError
 from services.users.users import USERS
 from datetime import datetime
@@ -26,7 +29,8 @@ def get_sheet_name(url: str) -> str:
             return name
 
     try:
-        spreadsheet = CLIENT.open_by_url(url)
+        client = gspread.service_account(filename=CREDENTIALS_FILE, scopes=SCOPES)
+        spreadsheet = client.open_by_url(url)
         name = spreadsheet.title
         _sheet_name_cache[url] = (name, now)
         return name
@@ -39,6 +43,8 @@ def get_sheet_name(url: str) -> str:
                 "sheet e condividerlo con l'user del bot."
             )
         raise e
+    finally:
+        client.http_client.session.close()
 
 def add_row(row: Row, username: str):
     """Aggiunge una riga allo sheet usando solo 3 chiamate API (prima erano 7)."""
@@ -48,12 +54,14 @@ def add_row(row: Row, username: str):
         now = datetime.now()
         month = MONTH_NAMES[now.month]
 
+        client = gspread.service_account(filename=CREDENTIALS_FILE, scopes=SCOPES)
+
         if row.split:
             # ① + ② API calls: apre spreadsheet e worksheet
-            spreadsheet = CLIENT.open_by_url(USERS.get_split_url(username))
+            spreadsheet = client.open_by_url(USERS.get_split_url(username))
         else:
         # ① + ② API calls: apre spreadsheet e worksheet
-            spreadsheet = CLIENT.open_by_url(USERS.get_url(username))
+            spreadsheet = client.open_by_url(USERS.get_url(username))
         sheet = spreadsheet.worksheet(month)
 
         # ③ API call: trova la prima riga vuota (col_values è più leggero di range)
@@ -82,6 +90,6 @@ def add_row(row: Row, username: str):
         logger.error("Errore di permessi")
         raise PermissionError("Accesso negato allo Sheet. Per ottenerlo, accedere allo sheet e condividerlo con l'user del bot.") from e
     finally:
-        CLIENT.http_client.session.close()
+        client.http_client.session.close()
         elapsed = time.time() - start
         logger.info("add_row completata in %.2fs (riga %d)", elapsed)
