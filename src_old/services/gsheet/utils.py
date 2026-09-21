@@ -40,7 +40,7 @@ def get_sheet_name(url: str) -> str:
         if isinstance(e, PermissionError):
             raise PermissionError(
                 "Accesso negato allo Sheet. Per ottenerlo, accedere allo "
-                "sheet e condividerlo con l'user del bot."
+                "sheet e condividerlo con l'user del bot <code>sa-cisot-bot@eighth-brace-469407-e3.iam.gserviceaccount.com</code>."
             )
         raise e
     finally:
@@ -88,7 +88,10 @@ def add_row(row: Row, username: str):
 
     except PermissionError as e:
         logger.error("Errore di permessi")
-        raise PermissionError("Accesso negato allo Sheet. Per ottenerlo, accedere allo sheet e condividerlo con l'user del bot.") from e
+        raise PermissionError(
+            "Accesso negato allo Sheet. Per ottenerlo, accedere allo "
+            "sheet e condividerlo con l'user del bot <code>sa-cisot-bot@eighth-brace-469407-e3.iam.gserviceaccount.com</code>."
+        ) from e
     finally:
         client.http_client.session.close()
         elapsed = time.time() - start
