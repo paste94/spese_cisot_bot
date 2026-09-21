@@ -93,6 +93,6 @@ def add_row(row: Row, username: str):
             "sheet e condividerlo con l'user del bot <code>sa-cisot-bot@eighth-brace-469407-e3.iam.gserviceaccount.com</code>."
         ) from e
     finally:
-        client.http_client.session.close()
+        client.http_client.session.close() 
         elapsed = time.time() - start
         logger.info("add_row completata in %.2fs (riga %d)", elapsed)
