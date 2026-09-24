@@ -23,7 +23,7 @@ def get_message(message):
         logger.warning(f"Unauthorized user: {message.from_user.username}: {message.text}")
         return
     logger.info(f"Received message from {message.from_user.username}: {message.text}")
-    start = time.now()
+    start = time.time()
     chat_id = message.chat.id
     user_id = message.from_user.id
     username = message.from_user.username
