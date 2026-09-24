@@ -7,7 +7,6 @@ import logging
 
 from gspread import NoValidUrlKeyFound
 from config import MONTH_NAMES
-# from services.gsheet.client import CLIENT
 from services.gsheet.exceptions import UnknownLinkError
 from services.users.users import USERS
 from datetime import datetime
@@ -72,36 +71,53 @@ def add_row(row: Row, username: str):
         now = datetime.now()
         month = MONTH_NAMES[now.month]
 
+        logger.debug("Creating client for user %s...", username)
         client = _create_gspread_client()
+        logger.debug("User %s has been added to the client, time: [%.2fs]", username, time.time() - start)
 
+        logger.debug("Getting sheet for user %s...", username)
         if row.split:
             spreadsheet = client.open_by_url(USERS.get_split_url(username))
         else:
             spreadsheet = client.open_by_url(USERS.get_url(username))
-            
-        sheet = spreadsheet.worksheet(month)
+        logger.debug("Sheet for user %s has been retrieved, time: [%.2fs]", username, time.time() - start)
 
+        logger.debug("Getting worksheet for user %s...", username)
+        sheet = spreadsheet.worksheet(month)
+        logger.debug("Worksheet for user %s has been retrieved, time: [%.2fs]", username, time.time() - start)
+
+        logger.debug("Getting col_values for user %s...", username)
         # ③ API call: trova la prima riga vuota (col_values è più leggero di range)
         col_values = sheet.col_values(1)
+        logger.debug("Col_values for user %s has been retrieved, time: [%.2fs]", username, time.time() - start)
         try:
+            logger.debug("Getting index for user %s...", username)
             index = col_values.index('') + 1
+            logger.debug("Index for user %s has been retrieved, time: [%.2fs]", username, time.time() - start)
         except ValueError:
             # Nessuna cella vuota trovata → aggiungi dopo l'ultima riga
+            logger.debug("No empty cell found for user %s...", username)
             index = len(col_values) + 1
+            logger.debug("Index for user %s has been set to %d, time: [%.2fs]", username, index, time.time() - start)
 
+        logger.debug("Updating sheet for user %s...", username)
         if row.split:
+            logger.debug("Split case for user %s...", username)
             sheet.batch_update([
                 {'range': f'A{index}', 'values': [[row.description]]},
                 {'range': f'B{index}', 'values': [[now.day]]},
                 {'range': f'E{index}', 'values': [[row.price]]},
             ])
+            logger.debug("Sheet for user %s has been updated, time: [%.2fs]", username, time.time() - start)
         else:
             # ④ API call UNICA: aggiorna tutte e 3 le celle in un solo batch
+            logger.debug("Normal case for user %s...", username)
             sheet.batch_update([
                 {'range': f'A{index}', 'values': [[row.description]]},
                 {'range': f'B{index}', 'values': [[now.day]]},
                 {'range': f'C{index}', 'values': [[row.price]]},
             ])
+            logger.debug("Sheet for user %s has been updated, time: [%.2fs]", username, time.time() - start)
 
     except PermissionError as e:
         logger.error("Errore di permessi")

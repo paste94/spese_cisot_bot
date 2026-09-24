@@ -1,3 +1,4 @@
+from datetime import time
 from services.gsheet.utils import add_row
 from model.row import Row
 import logging
@@ -19,26 +20,31 @@ active_timers: dict = {}
 def get_message(message):
     if not USERS.is_authorized(message.from_user.username):
         bot.reply_to(message, "❌ Non sei autorizzato a inviare messaggi.")
+        logger.warning(f"Unauthorized user: {message.from_user.username}: {message.text}")
         return
+    logger.info(f"Received message from {message.from_user.username}: {message.text}")
+    start = time.now()
     chat_id = message.chat.id
     user_id = message.from_user.id
     username = message.from_user.username
     row: Row = parse_message(message.text)
+    logger.debug("Parsed message in %.2fs", time.time() - start)
     if row.split == False:
         markup = InlineKeyboardMarkup(row_width=2)
         markup.add(
             InlineKeyboardButton("✅ Sì", callback_data="si_split"),
             InlineKeyboardButton("❌ No (Default)", callback_data="no_split")
         )
-        
+        logger.debug("Sending message to user %s", username)
         sent = bot.send_message(chat_id, f"🤔 Vuoi che questa spesa sia divisa? ({TIMEOUT_SECONDS}s timeout)", reply_markup=markup)
         bot.set_state(user_id , MessageState.waiting_split_decision, chat_id)
         with bot.retrieve_data(user_id, chat_id) as data:
             # data["timer"] = timer
             data["row"] = row
-
         start_timeout(chat_id, user_id, username, TIMEOUT_SECONDS, sent.message_id)
+        logger.debug("Waiting for user %s to decide if split or not. Total time: %.2fs", username, time.time() - start)
     else:
+        logger.debug("Loading row for user %s. Total time: %.2fs", username, time.time() - start)
         handle_add_row(row, username, chat_id, user_id)
 
 @bot.callback_query_handler(func=lambda call: call.data in ["si_split", "no_split"])

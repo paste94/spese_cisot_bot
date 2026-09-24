@@ -11,11 +11,11 @@ import handlers.message
 import handlers.settings
 
 # ── Logging con rotazione giornaliera (max 7 giorni) ─────────
-LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s.%(funcName)s: %(message)s"
 LOG_DATE_FMT = "%Y-%m-%d %H:%M:%S"
 
 root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
+root_logger.setLevel(logging.DEBUG)
 
 # File handler: ruota ogni mezzanotte, tiene max 7 file
 file_handler = TimedRotatingFileHandler(
