@@ -24,7 +24,7 @@ def _create_gspread_client():
     )
 
     # 10 secondi per connettersi, 30 secondi per ricevere la risposta
-    client.set_timeout((10, 30))
+    client.set_timeout((10, 20))
 
     # Evita di riutilizzare connessioni HTTP persistenti potenzialmente stale
     client.http_client.session.headers.update({
